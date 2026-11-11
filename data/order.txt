@@ -1,0 +1,60 @@
+# VitaTidy LiveArea order. One title id per line; text after # is a comment.
+# Listed apps keep this order. Apps not listed here are placed alphabetically
+# (articles ignored) among the listed ones. Copy this file to
+# ux0:data/VitaTidy/order.txt to change it.
+
+[cfw]
+VITASHELL   # VitaShell
+PSPEMUCFW   # Adrenaline (PSP emulator)
+AUTOPLUG2   # AutoPlugin II
+SKGD3PL0Y   # VitaDeploy
+SKGTLSE12   # iTLS-Enso
+SKGB4TF1X   # batteryFixer
+SKGYAMT01   # YAMT installer
+
+[games]
+PCSE00700   # AC Chronicles (Assassin's Creed Chronicles)
+PCSE00905   # Adventures of Mana
+PCSE00006   # Army Corps of Hell
+PCSE00053   # Assassin's Creed III Liberation
+PCSE00261   # Danganronpa: Trigger Happy Havoc
+PCSE00399   # Danganronpa 2: Goodbye Despair
+PCSA00106   # Destiny of Spirits
+PCSE00755   # Digimon Story: Cyber Sleuth
+PCSE00124   # Dokuro
+PCSE00014   # Dynasty Warriors Next
+PCSA00004   # Escape Plan
+PCSA00147   # Freedom Wars
+PCSA00011   # Gravity Rush
+PCSE00326   # Hatsune Miku: Project DIVA f
+PCSA00009   # Hot Shots Golf: World Invitational
+PCSE00443   # Hyperdimension Neptunia Re;Birth1
+PCSE00508   # Hyperdimension Neptunia Re;Birth2
+PCSE00661   # Hyperdimension Neptunia Re;Birth3
+PCSA00107   # Killzone Mercenary
+PCSA00010   # Little Deviants
+PCSA00017   # LittleBigPlanet
+PCSE00397   # Llamasoft TxK
+PCSE00009   # Lumines Electronic Symphony
+PCSE00359   # MIND≒0
+PCSA00001   # ModNation Racers: Road Trip
+PCSE00240   # Muramasa Rebirth
+PCSA00155   # Oreshika: Tainted Bloodlines
+PCSE00120   # Persona 4 Golden
+PCSE00764   # Persona 4: Dancing All Night
+PCSA00139   # PlayStation Vita Pets
+PCSE00300   # Ragnarok Odyssey ACE
+PCSA00012   # Reality Fighters
+PCSA00063   # Resistance: Burning Skies
+PCSE01153   # Secret of Mana
+PCSE00015   # Shinobido 2: Revenge of Zen
+PCSE00314   # Sorcery Saga: Curse of the Great Curry God
+PCSA00152   # Soul Sacrifice Delta
+PCSA00006   # Super Stardust Delta
+PCSE00465   # Sword Art Online: Hollow Fragment
+PCSA00144   # Tearaway
+PCSE00317   # Terraria
+PCSA00029   # Uncharted: Golden Abyss
+PCSA00014   # Unit 13
+PCSA00015   # WipEout 2048
+PCSE00245   # Ys: Memories of Celceta

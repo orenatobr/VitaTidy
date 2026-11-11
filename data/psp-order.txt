@@ -1,0 +1,37 @@
+# VitaTidy PSP list order. One file name per line, exactly as in ux0:pspemu/ISO.
+# The first line ends up as the newest file, which Adrenaline lists first.
+# Files not listed here are placed alphabetically among the listed ones.
+# Copy this file to ux0:data/VitaTidy/psp-order.txt to change it.
+
+3rd Birthday, The (USA) (PSP) (PSN).iso
+Castlevania - The Dracula X Chronicles (USA) (PSN).iso
+Crisis Core - Final Fantasy VII (USA).iso
+Dissidia 012 - Duodecim Final Fantasy (USA) (PSP) (PSN).iso
+Final Fantasy Type-0 (English Patched v2).iso
+God of War - Chains of Olympus (USA) (PSN).iso
+God of War - Ghost of Sparta (USA) (En,Fr,Es).iso
+Grand Theft Auto - Liberty City Stories (USA) (En,Fr,De,Es,It) (v3.00).iso
+Grand Theft Auto - Vice City Stories (USA) (PSP) (PSN).iso
+Grand Theft Auto - Chinatown Wars (USA) (PSP) (PSN).iso
+Jeanne d'Arc (USA) (PSP) (PSN).iso
+Killzone - Liberation (USA) (PSP) (PSN).iso
+Kingdom Hearts - Birth by Sleep (USA) (En,Fr,Es).iso
+Kurohyou Ryu ga Gotoku Shinshou (English v1.2)[TeamK4L].iso
+Legend of Heroes, The - Trails in the Sky (USA) (PSP) (PSN).iso
+Legend of Heroes - Trails in the Sky - Second Chapter (USA) (PSN) (Disc 1).iso
+Legend of Heroes - Trails in the Sky - Second Chapter (USA) (PSN) (Disc 2).iso
+LittleBigPlanet (USA) (PSN).iso
+MediEvil - Resurrection (USA) (PSP) (PSN).iso
+Mega Man - Maverick Hunter X (USA) (PSP) (PSN).iso
+Mega Man - Powered Up (USA).iso
+Metal Gear Solid - Portable Ops (USA) (PSP) (PSN).iso
+Metal Gear Solid - Peace Walker (USA) (PSP) (PSN).iso
+Phantasy Star Portable (USA).iso
+Phantasy Star Portable 2 (USA).iso
+Resistance - Retribution (USA) (PSN).iso
+Ultimate Ghosts 'n Goblins (USA) (PSP) (PSN).iso
+Valkyria Chronicles II (USA) (PSP) (PSN).iso
+Valkyria Chronicles 3 (English v1.0.7).iso
+White Knight Chronicles - Origins (Europe) (En,Fr,De,Es,It) (PSP) (PSN).iso
+Wild Arms XF (USA) (PSN).iso
+Ys Seven (USA) (PSN).iso
