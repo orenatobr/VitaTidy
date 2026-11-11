@@ -1,0 +1,25 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the VPK in the VitaSDK image
+        run: |
+          docker run --rm -v "$PWD":/src -w /src vitasdk/vitasdk:latest sh -c \
+            'cmake -S . -B build-vita -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake -DCMAKE_BUILD_TYPE=Release \
+             && cmake --build build-vita -j4'
+          cp build-vita/vitatidy.vpk VitaTidy.vpk
+          sha256sum VitaTidy.vpk > VitaTidy.vpk.sha256
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" VitaTidy.vpk VitaTidy.vpk.sha256 --title "$GITHUB_REF_NAME" --generate-notes --latest

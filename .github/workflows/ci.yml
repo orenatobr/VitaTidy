@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y cmake zlib1g-dev
+      - name: Build and test (ASan, UBSan)
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build -j4
+          ctest --test-dir build --output-on-failure
+
+  vpk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build the VPK in the VitaSDK image
+        run: |
+          docker run --rm -v "$PWD":/src -w /src vitasdk/vitasdk:latest sh -c \
+            'cmake -S . -B build-vita -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake -DCMAKE_BUILD_TYPE=Release \
+             && cmake --build build-vita -j4'
+          cp build-vita/vitatidy.vpk VitaTidy.vpk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: VitaTidy.vpk
+          path: VitaTidy.vpk
