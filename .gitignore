@@ -1,0 +1,4 @@
+build/
+build-vita/
+*.vpk
+.DS_Store
