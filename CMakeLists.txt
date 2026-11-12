@@ -12,7 +12,7 @@ set(SQLITE_DEFS SQLITE_OS_OTHER=1 SQLITE_THREADSAFE=0 SQLITE_OMIT_LOAD_EXTENSION
 if(VITA)
   include("$ENV{VITASDK}/share/vita.cmake" REQUIRED)
   set(VITA_APP_NAME "VitaTidy")
-  set(VITA_TITLEID "VTIDY0001")
+  set(VITA_TITLEID "VTDY00001")
   set(VITA_VERSION "01.00")
 
   add_executable(vitatidy src/vita/main.c src/vita/ui.c src/core/platform_vita.c ${CORE_SOURCES} third_party/sqlite3/sqlite3.c)

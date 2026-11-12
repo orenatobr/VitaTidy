@@ -59,6 +59,22 @@ int la_db_save(sqlite3 *db, const char *path, char *err, size_t errlen)
     return 0;
 }
 
+void la_clean_title(char *title)
+{
+    char *out = title;
+    int pending_space = 0;
+    for (const char *c = title; *c; c++) {
+        if ((unsigned char)*c < 0x20 || *c == 0x7f || *c == ' ') {
+            pending_space = out != title; /* no leading space */
+            continue;
+        }
+        if (pending_space) *out++ = ' ';
+        pending_space = 0;
+        *out++ = *c;
+    }
+    *out = '\0';
+}
+
 /* ---- planning ---- */
 
 static int is_game_id(const char *id)
@@ -138,6 +154,7 @@ int la_plan(sqlite3 *db, const OrderFile *order, LaPlan *plan, char *err, size_t
         memset(&it, 0, sizeof it);
         snprintf(it.id, sizeof it.id, "%s", (const char *)sqlite3_column_text(st, 0));
         snprintf(it.title, sizeof it.title, "%s", (const char *)sqlite3_column_text(st, 1));
+        la_clean_title(it.title);
         int is_cfw = orderfile_has(order->cfw, order->ncfw, it.id) ||
                      (!orderfile_has(order->games, order->ngames, it.id) && !is_game_id(it.id));
         if (is_cfw) cfw[ncfw++] = it; else games[ngames++] = it;
@@ -235,7 +252,11 @@ int la_apply(sqlite3 *db, const LaPlan *plan, int per_page, char *err, size_t er
              "CREATE TEMP TABLE vt_meta AS SELECT titleId, %s FROM tbl_appinfo_icon WHERE titleId NOT LIKE 'NPXS%%';"
              "CREATE TEMP TABLE vt_tpl AS SELECT %s FROM tbl_appinfo_page WHERE pageId IN (%s) LIMIT 1;"
              "DELETE FROM tbl_appinfo_icon WHERE titleId NOT LIKE 'NPXS%%';"
-             "DELETE FROM tbl_appinfo_page WHERE pageId NOT IN (%s);",
+             "DELETE FROM tbl_appinfo_page WHERE pageId NOT IN (%s);"
+             /* Close the holes inside system pages: icons keep their order and page, only pos is renumbered. */
+             "CREATE TEMP TABLE vt_rank AS SELECT pageId, pos AS old_pos, ROW_NUMBER() OVER (PARTITION BY pageId ORDER BY pos) - 1 AS new_pos FROM tbl_appinfo_icon;"
+             "UPDATE tbl_appinfo_icon SET pos = pos + 1000;"
+             "UPDATE tbl_appinfo_icon SET pos = (SELECT new_pos FROM vt_rank r WHERE r.pageId = tbl_appinfo_icon.pageId AND r.old_pos + 1000 = tbl_appinfo_icon.pos);",
              icon_cols, page_cols, sys_list, sys_list);
     if (run(db, err, errlen, sql)) goto fail;
 
@@ -252,7 +273,8 @@ int la_apply(sqlite3 *db, const LaPlan *plan, int per_page, char *err, size_t er
              icon_cols, icon_cols);
     if (sqlite3_prepare_v2(db, sql, -1, &icon_st, NULL) != SQLITE_OK) goto fail;
 
-    /* CFW apps fill their own pages, then games start on a fresh page. */
+    /* CFW apps fill their own pages and games start on a fresh page, so the only empty slots are
+     * at the end of the last CFW page and the last game page. */
     size_t groups[2][2] = {{0, plan->n_cfw}, {plan->n_cfw, plan->n}};
     for (int g = 0; g < 2; g++) {
         for (size_t start = groups[g][0]; start < groups[g][1]; start += (size_t)per_page) {
@@ -296,7 +318,7 @@ done:
     sqlite3_finalize(q);
     sqlite3_finalize(page_st);
     sqlite3_finalize(icon_st);
-    sqlite3_exec(db, "DROP TABLE IF EXISTS vt_meta; DROP TABLE IF EXISTS vt_tpl", NULL, NULL, NULL);
+    sqlite3_exec(db, "DROP TABLE IF EXISTS vt_meta; DROP TABLE IF EXISTS vt_tpl; DROP TABLE IF EXISTS vt_rank", NULL, NULL, NULL);
     free(icon_cols);
     free(page_cols);
     return rc;

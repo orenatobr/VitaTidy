@@ -296,6 +296,7 @@ int task_vita_games(const Paths *p, GameList *out, char *err, size_t errlen)
         memset(g, 0, sizeof *g);
         snprintf(g->id, sizeof g->id, "%s", id);
         snprintf(g->title, sizeof g->title, "%s", (const char *)sqlite3_column_text(st, 1));
+        la_clean_title(g->title);
         g->marked = fs_exists(backup) && files_differ(backup, icon);
     }
     sqlite3_finalize(st);

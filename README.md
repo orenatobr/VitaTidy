@@ -30,6 +30,8 @@ The Vita LiveArea reads its database at boot, so restart after reordering. For a
 
 ## How the order is decided
 
+The reorder leaves no holes between icons: system pages keep their icons and order but lose any holes between them. CFW apps get their own page and games start on the next one, ten per page, so the only empty slots are at the end of the last CFW page and the last game page. Titles with line breaks in the database are shown on one line.
+
 Apps listed in an order file keep that order. Anything else is placed alphabetically among them, ignoring a leading "The", "A" or "An". Unlisted apps whose id does not look like a game (`PCSE00120`, `NPNA00012`) go to the CFW page.
 
 The release ships the author's lists as defaults (`data/order.txt`, `data/psp-order.txt`). To use your own, copy them to `ux0:data/VitaTidy/` and edit:
@@ -51,11 +53,16 @@ The PSP file is one ISO file name per line, first line = newest.
 - Original icons are saved in `ux0:data/VitaTidy/originals/`. Toggling again restores them byte for byte.
 - A PSP icon is rewritten inside its original byte range, so the rest of the ISO is untouched. If the badged icon cannot fit, nothing is written.
 
+## Troubleshooting
+
+- **Error `0x80101130` while installing.** Version 1.0.0 used the title id `VTIDY0001`. The installer wants four letters and five digits, so it was renamed to `VTDY00001` in 1.0.1. If you installed 1.0.0 before, nothing needs cleaning up.
+- **Error `0x8010113D` while installing.** The installer only accepts PNGs in `sce_sys` that are exactly 8-bit indexed: 24-bit is rejected, and so is a lower bit depth (PIL picks one on its own when `optimize` is on). `tools/make_assets.py` now forces 8 bits.
+
 ## Limits
 
 - LiveArea folders are not supported. The reorder stops with a message if it finds one.
 - Only `.iso` files can be marked. `.cso` files are reordered but cannot be marked.
-- The reorder follows the layout used by the author's tooling: system pages stay as they are, user pages are rebuilt after them, 10 icons per page.
+- The reorder follows the layout used by the author's tooling: system pages keep their icons, user pages are rebuilt after them, 10 icons per page.
 
 ## Build
 

@@ -116,6 +116,16 @@ static void test_order(void)
     orderfile_free(&of);
 }
 
+static void test_clean_title(void)
+{
+    char t[64] = "  FREEDOM\nWARS\r\n  2 \t";
+    la_clean_title(t);
+    CHECK_STR(t, "FREEDOM WARS 2");
+    char u[8] = "";
+    la_clean_title(u);
+    CHECK_STR(u, "");
+}
+
 /* ---------- PNG and badge ---------- */
 
 static void test_png(void)
@@ -355,12 +365,12 @@ static void write_schema_db(const char *file)
     free(text);
     sql(db, "INSERT INTO tbl_appinfo_page(pageId,pageNo,bgColor) VALUES (2,0,33554431),(3,1,33554431),(4,2,33554431)");
     sql(db, "INSERT INTO tbl_appinfo_icon(pageId,pos,title,type,titleId,icon0Type) VALUES"
-            "(2,0,'PS Store',0,'NPXS10002',5),(3,0,'Videos',0,'NPXS10010',5)");
+            "(2,0,'PS Store',0,'NPXS10002',5),(2,4,'Browser',0,'NPXS10099',5),(3,0,'Videos',0,'NPXS10010',5)");
     /* One page with homebrew and games in a messy order. */
     sql(db, "INSERT INTO tbl_appinfo_icon(pageId,pos,title,type,titleId,icon0Type) VALUES"
             "(4,0,'Zeta Quest',0,'PCSE00003',5),(4,1,'VitaShell',0,'VITASHELL',5),(4,2,'The Alpha',0,'PCSA00001',5),"
             "(4,3,'Persona 4 Golden',0,'PCSE00120',5),(4,4,'Persona 4: Dancing',0,'PCSE00764',5),(4,5,'Adrenaline',0,'PSPEMUCFW',5),"
-            "(4,6,'Beta',0,'PCSB00002',5)");
+            "(4,6,'Be'||char(10)||'ta ',0,'PCSB00002',5)");
     sql(db, "INSERT INTO tbl_livearea(titleId,org_path,style,formatVer,background_image,gate_startupImage,titleColor) VALUES"
             "('PCSE00003','p','a','1',NULL,NULL,0),('PCSA00001','p','a','1','bg.png','gate.png',0),('NPXS10002','p','a','1','x','y',7)");
     assert(la_db_save(db, file, NULL, 0) == 0);
@@ -420,18 +430,23 @@ static void test_livearea(void)
     CHECK_STR(plan.items[5].id, "PCSE00764");
     CHECK_STR(plan.items[6].id, "PCSE00003");
 
+    CHECK_STR(plan.items[3].title, "Be ta"); /* line breaks in titles become one space */
     CHECK(la_apply(db, &plan, 3, err, sizeof err) == 0);
     CHECK_INT(count(db, "SELECT count(*) FROM tbl_appinfo_page"), 2 + 1 + 2); /* system pages, one CFW page, two game pages */
     titles_on_page(db, 0, pages, sizeof pages);
-    CHECK_STR(pages, "NPXS10002");
+    CHECK_STR(pages, "NPXS10002,NPXS10099");
+    /* The hole between the two system icons is closed: positions are 0 and 1. */
+    CHECK_INT(count(db, "SELECT max(pos) FROM tbl_appinfo_icon i JOIN tbl_appinfo_page p USING(pageId) WHERE p.pageNo = 0"), 1);
     titles_on_page(db, 1, pages, sizeof pages);
     CHECK_STR(pages, "NPXS10010");
+    /* CFW apps keep their own page; games start on a fresh one. Gaps exist only at the end of those pages. */
     titles_on_page(db, 2, pages, sizeof pages);
     CHECK_STR(pages, "VITASHELL,PSPEMUCFW");
     titles_on_page(db, 3, pages, sizeof pages);
     CHECK_STR(pages, "PCSA00001,PCSB00002,PCSE00120");
     titles_on_page(db, 4, pages, sizeof pages);
     CHECK_STR(pages, "PCSE00764,PCSE00003");
+    CHECK_INT(count(db, "SELECT count(*) FROM (SELECT pageId FROM tbl_appinfo_icon GROUP BY pageId HAVING max(pos) + 1 <> count(*))"), 0);
     /* Rows without artwork are dropped and labels turn white; system rows are untouched. */
     CHECK_INT(count(db, "SELECT count(*) FROM tbl_livearea WHERE titleId='PCSE00003'"), 0);
     CHECK_INT(count(db, "SELECT titleColor FROM tbl_livearea WHERE titleId='PCSA00001'"), 0xFFFFFF);
@@ -622,6 +637,7 @@ static void test_vita(void)
 
     GameList gl;
     CHECK(task_vita_games(&p, &gl, err, sizeof err) == 0);
+    for (size_t i = 0; i < gl.n; i++) CHECK(strchr(gl.v[i].title, '\n') == NULL);
     CHECK_INT(gl.n, 2); /* only games that have an icon on disk; VitaShell and Adrenaline are skipped */
     for (size_t i = 0; i < gl.n; i++) CHECK(!gl.v[i].marked);
     gamelist_free(&gl);
@@ -675,7 +691,7 @@ static void test_vita(void)
     sqlite3 *db;
     CHECK(la_db_load(p.db, &db, err, sizeof err) == 0);
     CHECK_INT(count(db, "SELECT count(*) FROM tbl_appinfo_icon WHERE titleId NOT LIKE 'NPXS%'"), 7);
-    CHECK_INT(count(db, "SELECT count(*) FROM tbl_appinfo_page WHERE pageNo >= 3"), 1);
+    CHECK_INT(count(db, "SELECT count(*) FROM tbl_appinfo_page WHERE pageNo >= 3"), 1); /* CFW page, then the game page */
     sqlite3_close(db);
     la_plan_free(&plan);
     free(icon);
@@ -686,6 +702,7 @@ int main(void)
 {
     make_tmp();
     test_order();
+    test_clean_title();
     test_png();
     test_badge();
     test_iso();

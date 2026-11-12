@@ -27,10 +27,18 @@ def grid(d, x, y, cell, gap, radius, check_at=(2, 0)):
                 d.line(pts, fill=WHITE, width=max(2, int(s * .12)), joint="curve")
 
 
+def save8(im, path):
+    """The Vita installer rejects PNGs in sce_sys unless they are exactly 8-bit indexed (error 0x8010113D).
+
+    24-bit is rejected, and so is a smaller bit depth, which PIL picks on its own when optimize is on.
+    """
+    im.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE).save(path, bits=8, optimize=False)
+
+
 def icon():
     im = Image.new("RGB", (128, 128), BG)
     grid(ImageDraw.Draw(im), 14, 14, 30, 7, 6)
-    im.save(os.path.join(OUT, "icon0.png"), optimize=True)
+    save8(im, os.path.join(OUT, "icon0.png"))
 
 
 def background():
@@ -39,7 +47,7 @@ def background():
     grid(d, 470, 70, 110, 18, 18)
     d.text((60, 190), "VitaTidy", font=font(72), fill=WHITE)
     d.text((64, 285), "Reorder the home screen.\nMark finished games.", font=font(26), fill=(148, 163, 184), spacing=10)
-    im.save(os.path.join(OUT, "livearea", "contents", "bg.png"), optimize=True)
+    save8(im, os.path.join(OUT, "livearea", "contents", "bg.png"))
 
 
 def startup():
@@ -47,7 +55,7 @@ def startup():
     d = ImageDraw.Draw(im)
     grid(d, 24, 28, 28, 6, 5)
     d.text((140, 56), "VitaTidy", font=font(30), fill=WHITE)
-    im.save(os.path.join(OUT, "livearea", "contents", "startup.png"), optimize=True)
+    save8(im, os.path.join(OUT, "livearea", "contents", "startup.png"))
 
 
 if __name__ == "__main__":
