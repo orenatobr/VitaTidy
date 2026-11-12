@@ -30,7 +30,7 @@ The Vita LiveArea reads its database at boot, so restart after reordering. For a
 
 ## How the order is decided
 
-The reorder leaves no empty slots: system pages keep their icons and order but lose any holes between them, and CFW apps and games then run on from the first free page, ten per page. Titles with line breaks in the database are shown on one line.
+The reorder leaves no holes between icons: system pages keep their icons and order but lose any holes between them. CFW apps get their own page and games start on the next one, ten per page, so the only empty slots are at the end of the last CFW page and the last game page. Titles with line breaks in the database are shown on one line.
 
 Apps listed in an order file keep that order. Anything else is placed alphabetically among them, ignoring a leading "The", "A" or "An". Unlisted apps whose id does not look like a game (`PCSE00120`, `NPNA00012`) go to the CFW page.
 

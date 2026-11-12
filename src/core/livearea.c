@@ -273,21 +273,25 @@ int la_apply(sqlite3 *db, const LaPlan *plan, int per_page, char *err, size_t er
              icon_cols, icon_cols);
     if (sqlite3_prepare_v2(db, sql, -1, &icon_st, NULL) != SQLITE_OK) goto fail;
 
-    /* One continuous run: CFW apps first, games right after them, every page full except the last. */
-    for (size_t start = 0; start < plan->n; start += (size_t)per_page) {
-        sqlite3_reset(page_st);
-        sqlite3_bind_int(page_st, 1, page_id);
-        sqlite3_bind_int(page_st, 2, page_no);
-        if (sqlite3_step(page_st) != SQLITE_DONE) goto fail;
-        for (size_t k = 0; k < (size_t)per_page && start + k < plan->n; k++) {
-            sqlite3_reset(icon_st);
-            sqlite3_bind_int(icon_st, 1, page_id);
-            sqlite3_bind_int(icon_st, 2, (int)k);
-            sqlite3_bind_text(icon_st, 3, plan->items[start + k].id, -1, SQLITE_STATIC);
-            if (sqlite3_step(icon_st) != SQLITE_DONE) goto fail;
+    /* CFW apps fill their own pages and games start on a fresh page, so the only empty slots are
+     * at the end of the last CFW page and the last game page. */
+    size_t groups[2][2] = {{0, plan->n_cfw}, {plan->n_cfw, plan->n}};
+    for (int g = 0; g < 2; g++) {
+        for (size_t start = groups[g][0]; start < groups[g][1]; start += (size_t)per_page) {
+            sqlite3_reset(page_st);
+            sqlite3_bind_int(page_st, 1, page_id);
+            sqlite3_bind_int(page_st, 2, page_no);
+            if (sqlite3_step(page_st) != SQLITE_DONE) goto fail;
+            for (size_t k = 0; k < (size_t)per_page && start + k < groups[g][1]; k++) {
+                sqlite3_reset(icon_st);
+                sqlite3_bind_int(icon_st, 1, page_id);
+                sqlite3_bind_int(icon_st, 2, (int)k);
+                sqlite3_bind_text(icon_st, 3, plan->items[start + k].id, -1, SQLITE_STATIC);
+                if (sqlite3_step(icon_st) != SQLITE_DONE) goto fail;
+            }
+            page_id++;
+            page_no++;
         }
-        page_id++;
-        page_no++;
     }
 
     /* Drop stale rows without artwork and make the labels white (as the original tool did). */

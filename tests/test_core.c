@@ -432,20 +432,20 @@ static void test_livearea(void)
 
     CHECK_STR(plan.items[3].title, "Be ta"); /* line breaks in titles become one space */
     CHECK(la_apply(db, &plan, 3, err, sizeof err) == 0);
-    CHECK_INT(count(db, "SELECT count(*) FROM tbl_appinfo_page"), 2 + 3); /* system pages, then 7 apps in pages of 3 */
+    CHECK_INT(count(db, "SELECT count(*) FROM tbl_appinfo_page"), 2 + 1 + 2); /* system pages, one CFW page, two game pages */
     titles_on_page(db, 0, pages, sizeof pages);
     CHECK_STR(pages, "NPXS10002,NPXS10099");
     /* The hole between the two system icons is closed: positions are 0 and 1. */
     CHECK_INT(count(db, "SELECT max(pos) FROM tbl_appinfo_icon i JOIN tbl_appinfo_page p USING(pageId) WHERE p.pageNo = 0"), 1);
     titles_on_page(db, 1, pages, sizeof pages);
     CHECK_STR(pages, "NPXS10010");
-    /* CFW apps and games share one run: no empty slots between them. */
+    /* CFW apps keep their own page; games start on a fresh one. Gaps exist only at the end of those pages. */
     titles_on_page(db, 2, pages, sizeof pages);
-    CHECK_STR(pages, "VITASHELL,PSPEMUCFW,PCSA00001");
+    CHECK_STR(pages, "VITASHELL,PSPEMUCFW");
     titles_on_page(db, 3, pages, sizeof pages);
-    CHECK_STR(pages, "PCSB00002,PCSE00120,PCSE00764");
+    CHECK_STR(pages, "PCSA00001,PCSB00002,PCSE00120");
     titles_on_page(db, 4, pages, sizeof pages);
-    CHECK_STR(pages, "PCSE00003");
+    CHECK_STR(pages, "PCSE00764,PCSE00003");
     CHECK_INT(count(db, "SELECT count(*) FROM (SELECT pageId FROM tbl_appinfo_icon GROUP BY pageId HAVING max(pos) + 1 <> count(*))"), 0);
     /* Rows without artwork are dropped and labels turn white; system rows are untouched. */
     CHECK_INT(count(db, "SELECT count(*) FROM tbl_livearea WHERE titleId='PCSE00003'"), 0);
@@ -691,7 +691,7 @@ static void test_vita(void)
     sqlite3 *db;
     CHECK(la_db_load(p.db, &db, err, sizeof err) == 0);
     CHECK_INT(count(db, "SELECT count(*) FROM tbl_appinfo_icon WHERE titleId NOT LIKE 'NPXS%'"), 7);
-    CHECK_INT(count(db, "SELECT count(*) FROM tbl_appinfo_page WHERE pageNo >= 2"), 1); /* 7 apps, 10 per page */
+    CHECK_INT(count(db, "SELECT count(*) FROM tbl_appinfo_page WHERE pageNo >= 3"), 1); /* CFW page, then the game page */
     sqlite3_close(db);
     la_plan_free(&plan);
     free(icon);
