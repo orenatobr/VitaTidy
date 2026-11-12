@@ -54,7 +54,7 @@ The PSP file is one ISO file name per line, first line = newest.
 ## Troubleshooting
 
 - **Error `0x80101130` while installing.** Version 1.0.0 used the title id `VTIDY0001`. The installer wants four letters and five digits, so it was renamed to `VTDY00001` in 1.0.1. If you installed 1.0.0 before, nothing needs cleaning up.
-- **Error `0x8010113D` while installing.** The installer rejects 24-bit PNGs in `sce_sys`. The artwork is now saved as 8-bit indexed (`tools/make_assets.py` does it).
+- **Error `0x8010113D` while installing.** The installer only accepts PNGs in `sce_sys` that are exactly 8-bit indexed: 24-bit is rejected, and so is a lower bit depth (PIL picks one on its own when `optimize` is on). `tools/make_assets.py` now forces 8 bits.
 
 ## Limits
 

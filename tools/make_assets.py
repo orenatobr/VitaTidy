@@ -28,8 +28,11 @@ def grid(d, x, y, cell, gap, radius, check_at=(2, 0)):
 
 
 def save8(im, path):
-    """The Vita installer rejects 24-bit PNGs in sce_sys (error 0x8010113D): save 8-bit indexed."""
-    im.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE).save(path, optimize=True)
+    """The Vita installer rejects PNGs in sce_sys unless they are exactly 8-bit indexed (error 0x8010113D).
+
+    24-bit is rejected, and so is a smaller bit depth, which PIL picks on its own when optimize is on.
+    """
+    im.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE).save(path, bits=8, optimize=False)
 
 
 def icon():
