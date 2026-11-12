@@ -51,6 +51,10 @@ The PSP file is one ISO file name per line, first line = newest.
 - Original icons are saved in `ux0:data/VitaTidy/originals/`. Toggling again restores them byte for byte.
 - A PSP icon is rewritten inside its original byte range, so the rest of the ISO is untouched. If the badged icon cannot fit, nothing is written.
 
+## Troubleshooting
+
+- **Error `0x80101130` while installing.** Version 1.0.0 used the title id `VTIDY0001`. The installer wants four letters and five digits, so it was renamed to `VTDY00001` in 1.0.1. If you installed 1.0.0 before, nothing needs cleaning up.
+
 ## Limits
 
 - LiveArea folders are not supported. The reorder stops with a message if it finds one.
