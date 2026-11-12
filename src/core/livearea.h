@@ -21,6 +21,9 @@ typedef struct {
     int sys_pages; /* pages holding system apps; our pages start after them */
 } LaPlan;
 
+/* Turns line breaks and other control characters in a title into single spaces and trims it. */
+void la_clean_title(char *title);
+
 /* Loads app.db from path into an in-memory database. Returns 0 on success. */
 int la_db_load(const char *path, sqlite3 **db, char *err, size_t errlen);
 /* Serializes the database to path. Returns 0 on success. */

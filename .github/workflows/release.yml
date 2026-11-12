@@ -18,6 +18,7 @@ jobs:
             'cmake -S . -B build-vita -DCMAKE_TOOLCHAIN_FILE=$VITASDK/share/vita.toolchain.cmake -DCMAKE_BUILD_TYPE=Release \
              && cmake --build build-vita -j4'
           cp build-vita/vitatidy.vpk VitaTidy.vpk
+          python3 tools/check_vpk.py VitaTidy.vpk
           sha256sum VitaTidy.vpk > VitaTidy.vpk.sha256
       - name: Publish
         env:

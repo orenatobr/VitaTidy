@@ -206,10 +206,7 @@ static void draw_menu(void)
 
 static int la_page_of(size_t i)
 {
-    const size_t per = LA_ITEMS_PER_PAGE;
-    size_t cfw_pages = (S.la.n_cfw + per - 1) / per;
-    int rel = i < S.la.n_cfw ? (int)(i / per) : (int)(cfw_pages + (i - S.la.n_cfw) / per);
-    return S.la.sys_pages + 1 + rel;
+    return S.la.sys_pages + 1 + (int)(i / LA_ITEMS_PER_PAGE);
 }
 
 static void apply_plan(void)
